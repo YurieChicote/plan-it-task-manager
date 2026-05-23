@@ -27,13 +27,13 @@ const ProjectDetail = () => {
       const token = localStorage.getItem('token');
       
       // Fetch project details
-      const pRes = await fetch(`/api/projects/${projectId}`, {
+      const pRes = await fetch(`${import.meta.env.VITE_API_URL}/api/projects/${projectId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const pData = await pRes.json();
       
       // Fetch tasks for this project
-      const tRes = await fetch(`/api/projects/${projectId}/tasks`, {
+      const tRes = await fetch(`${import.meta.env.VITE_API_URL}/api/projects/${projectId}/tasks`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const tData = await tRes.json();
@@ -55,7 +55,7 @@ const ProjectDetail = () => {
   const handleAddTask = async (taskData) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/tasks', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
