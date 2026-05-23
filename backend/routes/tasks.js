@@ -22,6 +22,7 @@ router.get('/', protect, async (req, res) => {
         if (req.query.status) filter.status = req.query.status;
         if (req.query.title) filter.title = { $regex: req.query.title, $options: 'i' };
         if (req.query.assignedTo) filter.assignedTo = req.query.assignedTo;
+        if (req.query.project) filter.project = req.query.project;
 
         const tasks = await Task.find(filter).sort({ createdAt: -1 }); 
         res.json(tasks);
@@ -75,11 +76,12 @@ router.post('/', protect, async (req, res) => {
     const { title, description, status } = req.body;
     
     try {
-        const newTask = new Task({
-            title,
-            description,
-            status: status || "Pending"
-        });
+       const { title, description, status, project } = req.body;
+       const newTask = new Task({title,
+        description,
+        status: status || "Pending",
+        project
+});
         const saved = await newTask.save();
         res.status(201).json(saved);
     } catch (err) {
