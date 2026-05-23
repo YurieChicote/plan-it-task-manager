@@ -32,8 +32,8 @@ const Projects = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        setProjects(data);
-      }
+  setProjects(Array.isArray(data) ? data : []);
+}
     } catch (err) {
       console.error("Fetch projects failed", err);
     } finally {
