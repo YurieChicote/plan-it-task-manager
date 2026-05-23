@@ -3,6 +3,17 @@ const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth'); 
 
+/**
+ * @swagger
+ * /api/tasks:
+ *   get:
+ *     summary: Retrieve all tasks
+ *     description: Fetch all tasks with optional filters by status, title, or assignee.
+ *     responses:
+ *       200:
+ *         description: Success
+ */
+
 // Fetch tasks + search filters niu
 router.get('/', protect, async (req, res) => {
     try {
@@ -20,6 +31,24 @@ router.get('/', protect, async (req, res) => {
     }
 });
 
+
+
+/**
+ * @swagger
+ * /api/tasks/{id}:
+ *   get:
+ *     summary: Get a single task by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Success
+ */
+
 // get single task
 router.get('/:id', protect, async (req, res) => {
     try {
@@ -31,6 +60,16 @@ router.get('/:id', protect, async (req, res) => {
     }
 });
 
+
+/**
+ * @swagger
+ * /api/tasks:
+ *   post:
+ *     summary: Create a new task
+ *     responses:
+ *       201:
+ *         description: Created
+ */
 // make a task
 router.post('/', protect, async (req, res) => {
     const { title, description, status } = req.body;
@@ -48,6 +87,21 @@ router.post('/', protect, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/tasks/{id}:
+ *   put:
+ *     summary: Update a task
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Updated
+ */
 // edit task 
 router.put('/:id', protect, async (req, res) => {
     try {
@@ -71,6 +125,23 @@ router.patch('/:id/complete', protect, async (req, res) => {
         res.status(400).json({ message: "Couldn't mark as done" });
     }
 });
+
+
+/**
+ * @swagger
+ * /api/tasks/{id}:
+ *   delete:
+ *     summary: Delete a task
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Deleted
+ */
 
 // delete task 
 router.delete('/:id', protect, async (req, res) => {

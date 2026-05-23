@@ -6,6 +6,15 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = "secret123"; 
 
+/**
+ * @swagger
+ * /api/users/register:
+ *   post:
+ *     summary: Register a new user account
+ *     responses:
+ *       201:
+ *         description: Account created
+ */
 // Registration
 router.post('/register', async (req, res) => {
     try {
@@ -35,7 +44,15 @@ router.post('/register', async (req, res) => {
         res.status(400).json({ message: "Failed to register" });
     }
 });
-
+/**
+ * @swagger
+ * /api/users/login:
+ *   post:
+ *     summary: Login and receive a JWT token
+ *     responses:
+ *       200:
+ *         description: Login successful
+ */
 // Login route
 router.post('/login', async (req, res) => {
     try {
@@ -68,6 +85,15 @@ router.post('/login', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Fetch all users
+ *     responses:
+ *       200:
+ *         description: Success
+ */
 // Fetch all users but hide passwords
 router.get('/', async (req, res) => {
     try {
