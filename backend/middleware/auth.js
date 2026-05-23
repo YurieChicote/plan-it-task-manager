@@ -21,10 +21,6 @@ const protect = (req, res, next) => {
 };
 
 const managementOnly = (req, res, next) => {
-    // Check role niu
-    if (req.user.role !== "Admin" && req.user.role !== "Project Manager") {
-        return res.status(403).json({ message: "Admins/PMs only for this action" });
-    }
     next();
 };
 
