@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
-import { PlusCircle, ArrowLeft, FolderOpen, Clock } from 'lucide-react';
+import { PlusCircle, ArrowLeft, FolderOpen } from 'lucide-react';
 import TaskCard from '@/components/TaskCard';
 import TaskForm from '@/components/TaskForm';
 
@@ -21,25 +21,19 @@ const ProjectDetail = () => {
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
-  // 1. Fetch Project + Tasks from Backend niu
   const loadData = async () => {
     try {
       const token = localStorage.getItem('token');
-      
-      // Fetch project details
       const pRes = await fetch(`${import.meta.env.VITE_API_URL}/api/projects/${projectId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const pData = await pRes.json();
-      
-      // Fetch tasks for this project
       const tRes = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks?project=${projectId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const tData = await tRes.json();
-
       if (pRes.ok) setProject(pData);
-      if (tRes.ok) setTasks(tData);
+      if (tRes.ok) setTasks(Array.isArray(tData) ? tData : []);
     } catch (err) {
       console.error("Load error:", err);
     } finally {
@@ -47,30 +41,87 @@ const ProjectDetail = () => {
     }
   };
 
-  useEffect(() => {
-    loadData();
-  }, [projectId]);
+  useEffect(() => { loadData(); }, [projectId]);
 
-  // 2. Add Task to MongoDB
   const handleAddTask = async (taskData) => {
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ ...taskData, project: projectId }),
       });
-
       if (res.ok) {
         toast({ title: 'Task Added' });
-        loadData(); // Refresh list
+        loadData();
         setIsTaskDialogOpen(false);
       }
     } catch (err) {
       toast({ title: 'Error adding task', variant: 'destructive' });
+    }
+  };
+
+  const handleEditTask = async (taskData) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks/${editingTask._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(taskData),
+      });
+      if (res.ok) {
+        toast({ title: 'Task Updated' });
+        loadData();
+        setIsTaskDialogOpen(false);
+        setEditingTask(null);
+      }
+    } catch (err) {
+      toast({ title: 'Error updating task', variant: 'destructive' });
+    }
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    if (!window.confirm("Delete this task?")) return;
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks/${taskId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        toast({ title: 'Task Deleted' });
+        loadData();
+      }
+    } catch (err) {
+      toast({ title: 'Error deleting task', variant: 'destructive' });
+    }
+  };
+
+  const handleStatusChange = async (taskId, completed) => {
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`${import.meta.env.VITE_API_URL}/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ completed }),
+      });
+      loadData();
+    } catch (err) {
+      console.error("Status update failed");
+    }
+  };
+
+  const handleProgressUpdate = async (taskId, progress) => {
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`${import.meta.env.VITE_API_URL}/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ progress }),
+      });
+      loadData();
+    } catch (err) {
+      console.error("Progress update failed");
     }
   };
 
@@ -85,9 +136,9 @@ const ProjectDetail = () => {
         </Button>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-             <FolderOpen className="text-purple-500" />
-             <h1 className="text-2xl font-bold">{project.name}</h1>
-             <Badge>{project.status}</Badge>
+            <FolderOpen className="text-purple-500" />
+            <h1 className="text-2xl font-bold">{project.name}</h1>
+            <Badge>{project.status}</Badge>
           </div>
           <p className="text-muted-foreground ml-8">{project.description}</p>
         </div>
@@ -102,17 +153,25 @@ const ProjectDetail = () => {
           <p className="text-muted-foreground italic">No tasks created yet.</p>
         ) : (
           tasks.map(t => (
-            <TaskCard key={t._id} task={t} />
+            <TaskCard
+              key={t._id}
+              task={t}
+              onEdit={(task) => { setEditingTask(task); setIsTaskDialogOpen(true); }}
+              onDelete={() => handleDeleteTask(t._id)}
+              onStatusChange={() => handleStatusChange(t._id, !t.completed)}
+              onProgressUpdate={handleProgressUpdate}
+            />
           ))
         )}
       </div>
 
       <Dialog open={isTaskDialogOpen} onOpenChange={setIsTaskDialogOpen}>
         <DialogContent>
-          <DialogTitle>New Project Task</DialogTitle>
-          <TaskForm 
-            onSubmit={handleAddTask} 
-            closeDialog={() => setIsTaskDialogOpen(false)} 
+          <DialogTitle>{editingTask ? 'Edit Task' : 'New Project Task'}</DialogTitle>
+          <TaskForm
+            onSubmit={editingTask ? handleEditTask : handleAddTask}
+            initialData={editingTask}
+            closeDialog={() => { setIsTaskDialogOpen(false); setEditingTask(null); }}
           />
         </DialogContent>
       </Dialog>
