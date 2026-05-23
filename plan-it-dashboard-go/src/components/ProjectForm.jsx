@@ -32,7 +32,7 @@ const ProjectForm = ({ onSubmit, initialData, closeDialog }) => {
 
   const handleFormSubmit = (data) => {
     onSubmit({
-      title: data.title,
+      name: data.title,  // change title to name
       description: data.description,
       deadline: data.deadline || undefined,
       status: data.status,
