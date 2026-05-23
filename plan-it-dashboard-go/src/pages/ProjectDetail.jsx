@@ -33,7 +33,7 @@ const ProjectDetail = () => {
       const pData = await pRes.json();
       
       // Fetch tasks for this project
-      const tRes = await fetch(`${import.meta.env.VITE_API_URL}/api/projects/${projectId}/tasks`, {
+      const tRes = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks?project=${projectId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const tData = await tRes.json();
