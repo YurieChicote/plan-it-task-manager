@@ -117,7 +117,7 @@ const ProjectForm = ({ onSubmit, initialData, closeDialog }) => {
           disabled={isSubmitting}
           className="bg-gradient-to-r from-brand-indigo to-brand-purple hover:opacity-90 transition-opacity"
         >
-          {initialData?.id ? 'Update Project' : 'Create Project'}
+          {initialData?._id ? 'Update Project' : 'Create Project'}
         </Button>
       </div>
     </form>

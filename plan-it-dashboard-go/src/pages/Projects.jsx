@@ -88,6 +88,28 @@ const Projects = () => {
     }
   };
 
+  const handleUpdateProject = async (formData) => {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/projects/${editingProject._id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(formData),
+    });
+    if (res.ok) {
+      toast({ title: 'Project Updated' });
+      fetchProjects();
+      setIsDialogOpen(false);
+      setEditingProject(null);
+    }
+  } catch (err) {
+    toast({ variant: "destructive", title: 'Error updating project' });
+  }
+};
+
   const handleEditProject = (project) => {
     setEditingProject(project);
     setIsDialogOpen(true);
@@ -143,7 +165,7 @@ const Projects = () => {
         <DialogContent>
           <DialogTitle>{editingProject ? 'Update' : 'New Project'}</DialogTitle>
           <ProjectForm
-            onSubmit={handleAddProject}
+            onSubmit={editingProject ? handleUpdateProject : handleAddProject}
             initialData={editingProject}
             closeDialog={() => setIsDialogOpen(false)}
           />
