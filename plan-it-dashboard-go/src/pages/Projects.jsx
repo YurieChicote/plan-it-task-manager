@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tabs, TabsList, TabsTrigger } from '@/tabs'; 
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { PlusCircle, FolderOpen } from 'lucide-react';
 import ProjectCard from '@/components/ProjectCard';
@@ -26,7 +26,7 @@ const Projects = () => {
   const fetchProjects = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/projects', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/projects`, {
         headers: { 
           'Authorization': `Bearer ${token}` 
         }
@@ -50,7 +50,7 @@ const Projects = () => {
   const handleAddProject = async (formData) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/projects', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/projects`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ const Projects = () => {
     
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`/api/projects/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/projects/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
