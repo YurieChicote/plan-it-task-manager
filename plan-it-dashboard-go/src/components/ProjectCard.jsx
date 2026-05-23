@@ -5,7 +5,7 @@ import { Pencil, Trash2, FolderOpen, Clock } from 'lucide-react';
 import { format, isBefore } from 'date-fns';
 
 const ProjectCard = ({ project, tasks, onEdit, onDelete, onClick }) => {
-  const projectTasks = tasks.filter(t => t.projectId === project.id);
+  const projectTasks = (tasks || []).filter(t => t.projectId === project.id);
   const completedCount = projectTasks.filter(t => t.status === 'completed').length;
   const totalCount = projectTasks.length;
   const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
