@@ -49,9 +49,20 @@ const swaggerDocs = swaggerJSDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, {
     swaggerOptions: {
         persistAuthorization: true,
+        authAction: {
+            bearerAuth: {
+                name: "bearerAuth",
+                schema: {
+                    type: "http",
+                    in: "header",
+                    name: "Authorization",
+                    description: ""
+                },
+                value: ""
+            }
+        }
     }
 }));
-
 // --- MONGOOSE CONNECTION ---
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/taskmanager';
 
