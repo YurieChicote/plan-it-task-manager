@@ -46,7 +46,11 @@ const swaggerOptions = {
 };
 
 const swaggerDocs = swaggerJSDoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, {
+    swaggerOptions: {
+        persistAuthorization: true,
+    }
+}));
 
 // --- MONGOOSE CONNECTION ---
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/taskmanager';
