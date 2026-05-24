@@ -9,21 +9,19 @@ const { protect } = require('../middleware/auth');
  *   get:
  *     summary: Retrieve all tasks
  *     description: Fetch all tasks with optional filters by status, title, or assignee.
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Success
  */
-
-// Fetch tasks + search filters niu
 router.get('/', protect, async (req, res) => {
     try {
         let filter = {}; 
-
         if (req.query.status) filter.status = req.query.status;
         if (req.query.title) filter.title = { $regex: req.query.title, $options: 'i' };
         if (req.query.assignedTo) filter.assignedTo = req.query.assignedTo;
         if (req.query.project) filter.project = req.query.project;
-
         const tasks = await Task.find(filter).sort({ createdAt: -1 }); 
         res.json(tasks);
     } catch (err) {
@@ -32,13 +30,13 @@ router.get('/', protect, async (req, res) => {
     }
 });
 
-
-
 /**
  * @swagger
  * /api/tasks/{id}:
  *   get:
  *     summary: Get a single task by ID
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -49,8 +47,6 @@ router.get('/', protect, async (req, res) => {
  *       200:
  *         description: Success
  */
-
-// get single task
 router.get('/:id', protect, async (req, res) => {
     try {
         const task = await Task.findById(req.params.id).populate('assignedTo', 'name');
@@ -61,12 +57,13 @@ router.get('/:id', protect, async (req, res) => {
     }
 });
 
-
 /**
  * @swagger
  * /api/tasks:
  *   post:
  *     summary: Create a new task
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -84,17 +81,15 @@ router.get('/:id', protect, async (req, res) => {
  *       201:
  *         description: Created
  */
-// make a task
 router.post('/', protect, async (req, res) => {
-    const { title, description, status } = req.body;
-    
     try {
-       const { title, description, status, project } = req.body;
-       const newTask = new Task({title,
-        description,
-        status: status || "Pending",
-        project
-});
+        const { title, description, status, project } = req.body;
+        const newTask = new Task({
+            title,
+            description,
+            status: status || "Pending",
+            project
+        });
         const saved = await newTask.save();
         res.status(201).json(saved);
     } catch (err) {
@@ -107,6 +102,8 @@ router.post('/', protect, async (req, res) => {
  * /api/tasks/{id}:
  *   put:
  *     summary: Update a task
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -117,7 +114,6 @@ router.post('/', protect, async (req, res) => {
  *       200:
  *         description: Updated
  */
-// edit task 
 router.put('/:id', protect, async (req, res) => {
     try {
         const updated = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -127,7 +123,6 @@ router.put('/:id', protect, async (req, res) => {
     }
 });
 
-// quick complete toggle
 router.patch('/:id/complete', protect, async (req, res) => {
     try {
         const updatedTask = await Task.findByIdAndUpdate(
@@ -141,12 +136,13 @@ router.patch('/:id/complete', protect, async (req, res) => {
     }
 });
 
-
 /**
  * @swagger
  * /api/tasks/{id}:
  *   delete:
  *     summary: Delete a task
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -157,8 +153,6 @@ router.patch('/:id/complete', protect, async (req, res) => {
  *       200:
  *         description: Deleted
  */
-
-// delete task 
 router.delete('/:id', protect, async (req, res) => {
     try {
         await Task.findByIdAndDelete(req.params.id);
@@ -168,7 +162,6 @@ router.delete('/:id', protect, async (req, res) => {
     }
 });
 
-// comment on task
 router.post('/:id/comments', protect, async (req, res) => {
     try {
         const task = await Task.findById(req.params.id);
@@ -180,20 +173,17 @@ router.post('/:id/comments', protect, async (req, res) => {
     }
 });
 
-// assign users to task
 router.patch('/:id/assign', protect, async (req, res) => {
-  try {
-    const task = await Task.findById(req.params.id);
-    if (!task) return res.status(404).json({ message: 'No task found' });
-
-    task.assignedTo = req.body.userIds;
-    await task.save();
-    
-    const populatedTask = await Task.findById(task._id).populate('assignedTo', 'name email');
-    res.json(populatedTask);
-  } catch (err) {
-    res.status(400).json({ message: "Assignment error" });
-  }
+    try {
+        const task = await Task.findById(req.params.id);
+        if (!task) return res.status(404).json({ message: 'No task found' });
+        task.assignedTo = req.body.userIds;
+        await task.save();
+        const populatedTask = await Task.findById(task._id).populate('assignedTo', 'name email');
+        res.json(populatedTask);
+    } catch (err) {
+        res.status(400).json({ message: "Assignment error" });
+    }
 });
 
 module.exports = router;
