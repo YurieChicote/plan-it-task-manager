@@ -11,6 +11,19 @@ const JWT_SECRET = "secret123";
  * /api/users/register:
  *   post:
  *     summary: Register a new user account
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Account created
@@ -49,6 +62,17 @@ router.post('/register', async (req, res) => {
  * /api/users/login:
  *   post:
  *     summary: Login and receive a JWT token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Login successful
