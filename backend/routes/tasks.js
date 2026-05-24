@@ -11,6 +11,13 @@ const { protect } = require('../middleware/auth');
  *     description: Fetch all tasks with optional filters by status, title, or assignee.
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "Bearer eyJhbG..."
  *     responses:
  *       200:
  *         description: Success
@@ -38,6 +45,12 @@ router.get('/', protect, async (req, res) => {
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "Bearer eyJhbG..."
  *       - in: path
  *         name: id
  *         required: true
@@ -64,6 +77,13 @@ router.get('/:id', protect, async (req, res) => {
  *     summary: Create a new task
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "Bearer eyJhbG..."
  *     requestBody:
  *       required: true
  *       content:
@@ -105,6 +125,12 @@ router.post('/', protect, async (req, res) => {
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "Bearer eyJhbG..."
  *       - in: path
  *         name: id
  *         required: true
@@ -144,6 +170,12 @@ router.patch('/:id/complete', protect, async (req, res) => {
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: "Bearer eyJhbG..."
  *       - in: path
  *         name: id
  *         required: true
