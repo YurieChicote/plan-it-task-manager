@@ -22,10 +22,13 @@ const swaggerOptions = {
             description: 'Core REST API handling user workspaces, role collaboration workflows, and text features.',
         },
         servers: [
-            {
-                url: `http://localhost:${process.env.PORT || 3000}`,
-            },
-        ],
+    {
+        url: 'https://plan-it-backend-yg9b.onrender.com',
+    },
+    {
+        url: `http://localhost:${process.env.PORT || 3000}`,
+    },
+],
     },
     apis: ['./routes/*.js', './server.js'], 
 };
